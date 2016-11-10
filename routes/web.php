@@ -30,7 +30,7 @@ Route::get('showLists', 'PhotoController@show' );
 
 Route::get('imageTest1', function () {
     //return the content of the image with unreadable words
-    $file = file_get_contents('../public/images/2016-11-08-06-06-21-zubat hola.jpg', FILE_USE_INCLUDE_PATH);
+    $file = file_get_contents('../public/images/2016-11-10-10-56-31-111.png', FILE_USE_INCLUDE_PATH);
     echo $file;
 });
 
@@ -59,3 +59,7 @@ Route::get('imageEncrypt/{id}', function($id) {
     $decrypted = Crypt::decrypt($encrypted);
     echo $decrypted;
 });
+
+Route::get('encrypt/{id}', 'PhotoController@encryptImage');
+
+Route::get('showSpec/{id}', 'PhotoController@showSpec');

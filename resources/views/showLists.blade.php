@@ -20,6 +20,7 @@
     @foreach( $images as $image )
         <div class="table table-bordered bg-success">
             <a href="{!! '/images/'.$image->filePath !!}">{{$image->title}}</a>
+            <img src="{{$image->src}}">
         </div>
     @endforeach
 

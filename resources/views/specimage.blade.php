@@ -18,7 +18,9 @@
 
     <h1 class="well well-lg">All Image List</h1>
 
-    <div class="table table-bordered bg-success"></div>
+    <div class="table table-bordered bg-success">
+        <img src="{{$image->src}}">
+    </div>
 
 </body>
 </html>
