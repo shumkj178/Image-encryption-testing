@@ -30,18 +30,20 @@ Route::get('showLists', 'PhotoController@show' );
 
 Route::get('imageTest1', function () {
     //return the content of the image with unreadable words
-    $file = file_get_contents('../public/images/2016-11-10-10-56-31-111.png', FILE_USE_INCLUDE_PATH);
+    $file = file_get_contents('', FILE_USE_INCLUDE_PATH);
     echo $file;
 });
 
 Route::get('imageTest2', function () {
-    $im = file_get_contents("../public/images/2016-11-08-06-27-42-418369.png");
+    //return an image
+    $im = file_get_contents('');
     header("Content-Type: image/png");
 
     echo $im;
 });
 
 Route::get('image/{id}',function($id) {
+    //return desired image
     $fileName = App\Image::find($id);
     $file = File::mimeType('../public/images/' . $fileName->filePath);
     $image = file_get_contents('../public/images/' . $fileName->filePath);
@@ -60,6 +62,8 @@ Route::get('imageEncrypt/{id}', function($id) {
     echo $decrypted;
 });
 
+//get the file from database and encrypt then save into encrypted folder
 Route::get('encrypt/{id}', 'PhotoController@encryptImage');
 
+//read the file from encrypted folder and decrypt
 Route::get('showSpec/{id}', 'PhotoController@showSpec');

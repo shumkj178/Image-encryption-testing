@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests;
+use finfo;
 use Guzzle\Tests\Plugin\Redirect;
 use App\Image;
 use Illuminate\Http\Request;
@@ -10,6 +11,7 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Input;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 class PhotoController extends Controller
 {
@@ -90,13 +92,25 @@ class PhotoController extends Controller
     }
 
     public function showSpec($id){
-        $imageEncrypted = file_get_contents(public_path() . '/encrypted/' . 'encrypted-id-' . $id);
-        $decrypted = Crypt::decrypt($imageEncrypted);
-        $file = File::mimeType(public_path() . '/encrypted/' . 'encrypted-id-' . $id);
-        header("Content-Type: $file");
+//        $imageEncrypted = file_get_contents(public_path() . '/encrypted/' . 'encrypted-id-' . $id);
+//        $decrypted = Crypt::decrypt($imageEncrypted);
+//        $file = File::mimeType(public_path() . '/encrypted/' . 'encrypted-id-' . $id);
+//        header("Content-Type: $file");
 //        $data = array(
 //            'var1' => $image
 //        );
+//        $encryptedContents = Storage::get(public_path() . '/encrypted/' . 'encrypted-id-' . $id);
+
+        //refer to http://stackoverflow.com/questions/34624118/working-with-encrypted-files-in-laravel-how-to-download-decrypted-file
+        //make changes on file get contents
+        $imageEncrypted = file_get_contents(public_path() . '/encrypted/' . 'encrypted-id-' . $id);
+        $decryptedContents = Crypt::decrypt($imageEncrypted);
+
+        return response()->make($decryptedContents, 200, array(
+            'Content-Type' => (new finfo(FILEINFO_MIME))->buffer($decryptedContents),
+            'Content-Disposition' => 'attachment; filename="' . pathinfo(public_path() . '/encrypted/' . 'encrypted-id-' . $id, PATHINFO_BASENAME) . '"'
+        ));
+
         echo $decrypted;
     }
 }
