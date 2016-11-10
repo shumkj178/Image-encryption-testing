@@ -61,7 +61,6 @@ class PhotoController extends Controller
     }
 
     public function showSpec($id){
-
-        return view('specimage', $id);
+        //
     }
 }

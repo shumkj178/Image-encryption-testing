@@ -18,12 +18,7 @@
 
     <h1 class="well well-lg">All Image List</h1>
 
-    <div class="table table-bordered bg-success">
-            <a href="{!! '/images/'.$image->filePath !!}">{{$image->title}}</a>
-
-
-<!--        <img src="{!! '/images/'.$image->filePath !!}">-->
-    </div>
+    <div class="table table-bordered bg-success"></div>
 
 </body>
 </html>

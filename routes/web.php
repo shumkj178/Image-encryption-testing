@@ -21,15 +21,6 @@ Route::post('imageUploadForm', 'PhotoController@store' );
 
 Route::get('showLists', 'PhotoController@show' );
 
-Route::get('encrypt', function () {
-    $work = 'love';
-    echo $work . '<br>';
-    $encrypted = Crypt::encrypt($work);
-    echo $encrypted .'<br>';
-    $decrypted = Crypt::decrypt($encrypted);
-    echo $decrypted . '<br>';
-});
-
 //Route::get('image/{id}', function ($id) {
 //    $image = App\Image::find($id);
 //    echo $image->title . '<br>';
@@ -50,10 +41,21 @@ Route::get('imageTest2', function () {
     echo $im;
 });
 
-Route::get('imageTest/{id}',function($id) {
+Route::get('image/{id}',function($id) {
     $fileName = App\Image::find($id);
     $file = File::mimeType('../public/images/' . $fileName->filePath);
     $image = file_get_contents('../public/images/' . $fileName->filePath);
     header("Content-Type: $file");
     echo $image;
+});
+
+//To test out the encryption
+Route::get('imageEncrypt/{id}', function($id) {
+    $fileName = App\Image::find($id);
+    $file = File::mimeType('../public/images/' . $fileName->filePath);
+    $image = file_get_contents('../public/images/' . $fileName->filePath);
+    header("Content-Type: $file");
+    $encrypted = Crypt::encrypt($image);
+    $decrypted = Crypt::decrypt($encrypted);
+    echo $decrypted;
 });
