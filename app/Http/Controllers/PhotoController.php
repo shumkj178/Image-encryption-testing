@@ -26,7 +26,7 @@ class PhotoController extends Controller
     }
 
     /**
-     * Store a newly uploaded resource in storage.
+     * Store a newly uploaded resource in public folder.
      *
      * @return Response
      */
@@ -80,26 +80,9 @@ class PhotoController extends Controller
         $filename = 'encrypted-id-' . $image->id;
         file_put_contents(public_path(). '/encrypted/' . $filename, $encrypted);
 
-        //Another way
-//        $image = Image::find($id);
-//        //use Illuminate\Support\Facades\File;
-//        $file = File::mimeType(public_path(). '/images/' . $image->filePath);
-//        $imageEncrypted = file_get_contents(public_path(). '/images/' . $image->filePath);
-//        header("Content-Type: $file");
-//        $filename = 'encrypted-id-' . $image->id . $file;
-//        dd($filename);
-//        $imageEncrypted = file_put_contents(public_path(),'/encrypted/',$filename);
     }
 
     public function showSpec($id){
-//        $imageEncrypted = file_get_contents(public_path() . '/encrypted/' . 'encrypted-id-' . $id);
-//        $decrypted = Crypt::decrypt($imageEncrypted);
-//        $file = File::mimeType(public_path() . '/encrypted/' . 'encrypted-id-' . $id);
-//        header("Content-Type: $file");
-//        $data = array(
-//            'var1' => $image
-//        );
-//        $encryptedContents = Storage::get(public_path() . '/encrypted/' . 'encrypted-id-' . $id);
 
         //refer to http://stackoverflow.com/questions/34624118/working-with-encrypted-files-in-laravel-how-to-download-decrypted-file
         //make changes on file get contents
@@ -107,10 +90,19 @@ class PhotoController extends Controller
         $decryptedContents = Crypt::decrypt($imageEncrypted);
 
         return response()->make($decryptedContents, 200, array(
+            //return the content
             'Content-Type' => (new finfo(FILEINFO_MIME))->buffer($decryptedContents),
+            //let user choose to view content or save content
             'Content-Disposition' => 'attachment; filename="' . pathinfo(public_path() . '/encrypted/' . 'encrypted-id-' . $id, PATHINFO_BASENAME) . '"'
         ));
+    }
 
-        echo $decrypted;
+    public function showView($id){
+        $imageEncrypted = file_get_contents(public_path() . '/encrypted/' . 'encrypted-id-' . $id);
+        $decryptedContents = Crypt::decrypt($imageEncrypted);
+
+        return response()->make($decryptedContents, 200, array(
+            'Content-Type' => (new finfo(FILEINFO_MIME))->buffer($decryptedContents),
+        ));
     }
 }

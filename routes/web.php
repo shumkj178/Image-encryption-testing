@@ -66,4 +66,13 @@ Route::get('imageEncrypt/{id}', function($id) {
 Route::get('encrypt/{id}', 'PhotoController@encryptImage');
 
 //read the file from encrypted folder and decrypt
+//include let user choose to save or view file
 Route::get('showSpec/{id}', 'PhotoController@showSpec');
+
+//read the file, just view
+Route::get('showView/{id}', 'PhotoController@showView');
+
+//another way of viewing the file
+Route::get('showImage/{id}', function ($id) {
+    return "Image $id :- <img src=\"/showView/$id\" />";
+});
