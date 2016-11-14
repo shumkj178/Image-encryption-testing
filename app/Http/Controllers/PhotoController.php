@@ -60,7 +60,7 @@ class PhotoController extends Controller
             $name = 'uploaded-id-' . $id;
 
             $record->image_id = $id;
-            $record->time = Carbon::now()->toTimeString();
+            $record->time = Carbon::now()->toDayDateTimeString();
             $record->ip_address = $request->ip();
             $record->logs = 'Image ' . $image->title . ' id-' . $id . ' uploaded';
 
@@ -92,7 +92,7 @@ class PhotoController extends Controller
         file_put_contents(public_path(). '/encrypted/' . $filename, $encrypted);
         $record = new Record();
         $record->image_id = $id;
-        $record->time = Carbon::now()->toTimeString();
+        $record->time = Carbon::now()->toDayDateTimeString();
         $record->ip_address = $request->ip();
         $record->logs = 'Image ' . $image->title . ' id-' . $id . ' encrypted';
         $record->save();
@@ -108,7 +108,7 @@ class PhotoController extends Controller
 
         $record = new Record();
         $record->image_id = $id;
-        $record->time = Carbon::now()->toTimeString();
+        $record->time = Carbon::now()->toDayDateTimeString();
         $record->ip_address = $request->ip();
         $record->logs = 'Image ' . $image->title . ' id-' . $id . ' viewed';
         $record->save();
@@ -128,7 +128,7 @@ class PhotoController extends Controller
 
         $record = new Record();
         $record->image_id = $id;
-        $record->time = Carbon::now()->toTimeString();
+        $record->time = Carbon::now()->toDayDateTimeString();
         $record->ip_address = $request->ip();
         $record->logs = 'Image ' . $image->title . ' id-' . $id . ' viewed';
         $record->save();
@@ -155,7 +155,7 @@ class PhotoController extends Controller
     //testing purpose
     public function logging(){
         $log = str_replace([' ', ':'], '-', Carbon::now()->toDateTimeString());
-        $log2 = Carbon::now()->toTimeString();
+        $log2 = Carbon::now()->toDayDateTimeString();
         $data = DB::table('images')->max('id');
         echo $data +1 . '<br>';
         echo $log . '<br>';
