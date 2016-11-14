@@ -21,13 +21,6 @@ Route::post('imageUploadForm', 'PhotoController@store' );
 
 Route::get('showLists', 'PhotoController@show' );
 
-//Route::get('image/{id}', function ($id) {
-//    $image = App\Image::find($id);
-//    echo $image->title . '<br>';
-//    echo $image->description . '<br>';
-//    echo $image->filePath . '<br>';
-//});
-
 Route::get('imageTest1', function () {
     //return the content of the image with unreadable words
     $file = file_get_contents('', FILE_USE_INCLUDE_PATH);
@@ -45,8 +38,8 @@ Route::get('imageTest2', function () {
 Route::get('image/{id}',function($id) {
     //return desired image
     $fileName = App\Image::find($id);
-    $file = File::mimeType('../public/images/' . $fileName->filePath);
-    $image = file_get_contents('../public/images/' . $fileName->filePath);
+    $file = File::mimeType(public_path() . '/images/' . 'uploaded-id-' . $fileName->id);
+    $image = file_get_contents(public_path() . '/images/' . 'uploaded-id-' . $id);
     header("Content-Type: $file");
     echo $image;
 });
@@ -76,3 +69,5 @@ Route::get('showView/{id}', 'PhotoController@showView');
 Route::get('showImage/{id}', function ($id) {
     return "Image $id :- <img src=\"/showView/$id\" />";
 });
+
+Route::get('ip', 'PhotoController@logging');
