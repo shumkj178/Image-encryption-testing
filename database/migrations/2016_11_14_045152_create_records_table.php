@@ -16,7 +16,7 @@ class CreateRecordsTable extends Migration
         Schema::create('records', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('image_id')->unsigned();
-            $table->text('time');
+            $table->timestamp('time');
             $table->text('ip_address');
             $table->text('logs');
             $table->timestamps();

@@ -7,6 +7,7 @@ use App\Record;
 use finfo;
 use Guzzle\Tests\Plugin\Redirect;
 use App\Image;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
@@ -48,7 +49,7 @@ class PhotoController extends Controller
 
 //            $name = $timestamp. '-' .$file->getClientOriginalName();
 
-//            $type = Input::file('image')->extension();
+            $type = Input::file('image')->extension();
 
 //            $image->filePath = $name;
 
@@ -57,19 +58,33 @@ class PhotoController extends Controller
 //            $image->src = 'data:image/' . $type . ';base64,' . $base64;
             $data = DB::table('images')->max('id');
             $id = $data +1;
-            $name = 'uploaded-id-' . $id;
+            $image->file_type = $type;
+//            $name = 'uploaded-id-' . $id;
 
             $record->image_id = $id;
-            $record->time = Carbon::now()->toDayDateTimeString();
+            $record->time = Carbon::now();
             $record->ip_address = $request->ip();
             $record->logs = 'Image ' . $image->title . ' id-' . $id . ' uploaded';
 
-            $file->move(public_path().'/images/', $name);
+//            $file->move(public_path().'/images/', $name);
         }
         $image->save();
         $record->save();
-//        return $this->create()->with('success', 'Image Uploaded Successfully');
-        return $this->show();
+
+        $content = file_get_contents($file);
+        $title = $image->title;
+        $encrypted = Crypt::encrypt($content);
+        $filename = 'encrypted-id-' . $id;
+        file_put_contents(public_path(). '/encrypted/' . $filename, $encrypted);
+        $record = new Record();
+        $record->image_id = $id;
+        $record->time = Carbon::now();
+        $record->ip_address = $request->ip();
+        $record->logs = 'Image ' . $title . ' id-' . $id . ' encrypted';
+        $record->save();
+
+        return view('imageupload')->with('success', 'Image Uploaded Successfully');
+
     }
 
     /**
@@ -82,19 +97,20 @@ class PhotoController extends Controller
         return view('showLists', compact('images'));
     }
 
-    public function encryptImage($id, Request $request){
-        $image = Image::find($id);
+    //not use
+    public function encryptImage($data, $id, $title, Request $request){
+//        $image = Image::find($id);
 //        $img_string = explode(',', $image->src);
 //        $data = base64_decode($img_string[1]);
-        $data = file_get_contents(public_path() . '/images/' . 'uploaded-id-' . $id);
+//        $data = file_get_contents(public_path() . '/images/' . 'uploaded-id-' . $id);
         $encrypted = Crypt::encrypt($data);
-        $filename = 'encrypted-id-' . $image->id;
+        $filename = 'encrypted-id-' . $id;
         file_put_contents(public_path(). '/encrypted/' . $filename, $encrypted);
         $record = new Record();
         $record->image_id = $id;
-        $record->time = Carbon::now()->toDayDateTimeString();
+        $record->time = Carbon::now();
         $record->ip_address = $request->ip();
-        $record->logs = 'Image ' . $image->title . ' id-' . $id . ' encrypted';
+        $record->logs = 'Image ' . $title . ' id-' . $id . ' encrypted';
         $record->save();
     }
 
@@ -108,7 +124,7 @@ class PhotoController extends Controller
 
         $record = new Record();
         $record->image_id = $id;
-        $record->time = Carbon::now()->toDayDateTimeString();
+        $record->time = Carbon::now();
         $record->ip_address = $request->ip();
         $record->logs = 'Image ' . $image->title . ' id-' . $id . ' viewed';
         $record->save();
@@ -128,7 +144,7 @@ class PhotoController extends Controller
 
         $record = new Record();
         $record->image_id = $id;
-        $record->time = Carbon::now()->toDayDateTimeString();
+        $record->time = Carbon::now();
         $record->ip_address = $request->ip();
         $record->logs = 'Image ' . $image->title . ' id-' . $id . ' viewed';
         $record->save();
@@ -155,7 +171,7 @@ class PhotoController extends Controller
     //testing purpose
     public function logging(){
         $log = str_replace([' ', ':'], '-', Carbon::now()->toDateTimeString());
-        $log2 = Carbon::now()->toDayDateTimeString();
+        $log2 = Carbon::now();
         $data = DB::table('images')->max('id');
         echo $data +1 . '<br>';
         echo $log . '<br>';
