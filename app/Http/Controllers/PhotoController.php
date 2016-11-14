@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests;
+use App\Record;
 use finfo;
 use Guzzle\Tests\Plugin\Redirect;
 use App\Image;
@@ -33,9 +34,10 @@ class PhotoController extends Controller
      */
     public function store(Request $request){
         $image = new Image();
+        $record = new Record();
         $this->validate($request, [
             'title' => 'required',
-            'image' => 'required'
+            'description' => 'required'
         ]);
         $image->title = $request->title;
         $image->description = $request->description;
@@ -57,10 +59,15 @@ class PhotoController extends Controller
             $id = $data +1;
             $name = 'uploaded-id-' . $id;
 
-            $file->move(public_path().'/images/', $name);
+            $record->image_id = $id;
+            $record->time = Carbon::now()->toTimeString();
+            $record->ip_address = $request->ip();
+            $record->logs = 'Image ' . $image->title . ' id-' . $id . ' uploaded';
 
+            $file->move(public_path().'/images/', $name);
         }
         $image->save();
+        $record->save();
 //        return $this->create()->with('success', 'Image Uploaded Successfully');
         return $this->show();
     }
@@ -75,7 +82,7 @@ class PhotoController extends Controller
         return view('showLists', compact('images'));
     }
 
-    public function encryptImage($id){
+    public function encryptImage($id, Request $request){
         $image = Image::find($id);
 //        $img_string = explode(',', $image->src);
 //        $data = base64_decode($img_string[1]);
@@ -83,33 +90,55 @@ class PhotoController extends Controller
         $encrypted = Crypt::encrypt($data);
         $filename = 'encrypted-id-' . $image->id;
         file_put_contents(public_path(). '/encrypted/' . $filename, $encrypted);
-
+        $record = new Record();
+        $record->image_id = $id;
+        $record->time = Carbon::now()->toTimeString();
+        $record->ip_address = $request->ip();
+        $record->logs = 'Image ' . $image->title . ' id-' . $id . ' encrypted';
+        $record->save();
     }
 
-    public function showSpec($id){
+    public function showSpec($id, Request $request){
 
         //refer to http://stackoverflow.com/questions/34624118/working-with-encrypted-files-in-laravel-how-to-download-decrypted-file
         //make changes on file get contents
+        $image = Image::find($id);
         $imageEncrypted = file_get_contents(public_path() . '/encrypted/' . 'encrypted-id-' . $id);
         $decryptedContents = Crypt::decrypt($imageEncrypted);
+
+        $record = new Record();
+        $record->image_id = $id;
+        $record->time = Carbon::now()->toTimeString();
+        $record->ip_address = $request->ip();
+        $record->logs = 'Image ' . $image->title . ' id-' . $id . ' viewed';
+        $record->save();
 
         return response()->make($decryptedContents, 200, array(
             //return the content
             'Content-Type' => (new finfo(FILEINFO_MIME))->buffer($decryptedContents),
-            //let user choose to view content or save content
+            //let user choose to either view content or save content
             'Content-Disposition' => 'attachment; filename="' . pathinfo(public_path() . '/encrypted/' . 'encrypted-id-' . $id, PATHINFO_BASENAME) . '"'
         ));
     }
 
-    public function showView($id){
+    public function showView($id, Request $request){
+        $image = Image::find($id);
         $imageEncrypted = file_get_contents(public_path() . '/encrypted/' . 'encrypted-id-' . $id);
         $decryptedContents = Crypt::decrypt($imageEncrypted);
+
+        $record = new Record();
+        $record->image_id = $id;
+        $record->time = Carbon::now()->toTimeString();
+        $record->ip_address = $request->ip();
+        $record->logs = 'Image ' . $image->title . ' id-' . $id . ' viewed';
+        $record->save();
 
         return response()->make($decryptedContents, 200, array(
             'Content-Type' => (new finfo(FILEINFO_MIME))->buffer($decryptedContents),
         ));
     }
 
+    //testing purpose
     public function printIP(Request $request){
         // #1
 //        $ipAddress = $_SERVER['REMOTE_ADDR'];
@@ -123,6 +152,7 @@ class PhotoController extends Controller
         return 'IP Address : '. $ipAddress;
     }
 
+    //testing purpose
     public function logging(){
         $log = str_replace([' ', ':'], '-', Carbon::now()->toDateTimeString());
         $log2 = Carbon::now()->toTimeString();

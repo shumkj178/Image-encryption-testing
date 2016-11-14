@@ -47,8 +47,8 @@ Route::get('image/{id}',function($id) {
 //To test out the encryption
 Route::get('imageEncrypt/{id}', function($id) {
     $fileName = App\Image::find($id);
-    $file = File::mimeType('../public/images/' . $fileName->filePath);
-    $image = file_get_contents('../public/images/' . $fileName->filePath);
+    $file = File::mimeType('../public/images/' . $fileName->id);
+    $image = file_get_contents('../public/images/' . $fileName->id);
     header("Content-Type: $file");
     $encrypted = Crypt::encrypt($image);
     $decrypted = Crypt::decrypt($encrypted);
@@ -70,4 +70,5 @@ Route::get('showImage/{id}', function ($id) {
     return "Image $id :- <img src=\"/showView/$id\" />";
 });
 
+//testing purpose
 Route::get('ip', 'PhotoController@logging');
